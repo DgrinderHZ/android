@@ -22,8 +22,9 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void submitOrder(View view){
-        display(5);
-        displayPrice(5*2);
+        int numberOfCoffees = 2;
+        display(numberOfCoffees);
+        displayPrice(numberOfCoffees*2);
     }
 
     /**
