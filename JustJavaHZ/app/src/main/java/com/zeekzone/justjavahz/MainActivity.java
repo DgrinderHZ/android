@@ -21,10 +21,28 @@ public class MainActivity extends AppCompatActivity {
      * This Method is called when the button Order is clicked
      * @param view
      */
+    int quantity = 2;
     public void submitOrder(View view){
-        int numberOfCoffees = 2;
-        display(numberOfCoffees);
-        displayPrice(numberOfCoffees*2);
+        display(quantity);
+        displayPrice(quantity*2);
+    }
+
+    /**
+     * This Method is called when the button + is clicked
+     * @param view
+     */
+    public void increment(View view){
+        quantity = quantity +1;
+        display(quantity);
+    }
+
+    /**
+     * This Method is called when the button - is clicked
+     * @param view
+     */
+    public void decrement(View view){
+        quantity = quantity - 1;
+        display(quantity);
     }
 
     /**
