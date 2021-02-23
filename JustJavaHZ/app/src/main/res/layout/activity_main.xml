@@ -6,6 +6,21 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Toppings"
+        android:textAllCaps="true"
+        android:textColor="@color/black"
+        android:textSize="36sp" />
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/toppings"
+        android:paddingLeft="24dp"
+        android:layout_marginLeft="16dp"
+        android:textSize="16sp" />
 
     <TextView
         android:layout_width="wrap_content"
