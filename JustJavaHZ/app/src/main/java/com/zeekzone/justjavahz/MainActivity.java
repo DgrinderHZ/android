@@ -3,6 +3,7 @@ package com.zeekzone.justjavahz;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,12 +17,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    int quantity = 0;
+    int unitPrice = 5;
+    boolean hasWhippedCream = false;
+
     /**
      * This Method is called when the button Order is clicked
      * @param view
      */
-    int quantity = 0;
-    int unitPrice = 5;
+
     public void submitOrder(View view){
         int price = calculatePrice(quantity, unitPrice);
         String priceMessage = createOrderSummary(price);
@@ -29,12 +33,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     *
+     * @param view
+     * @return
+     */
+    private void addWhippedCream(View view){
+        CheckBox whippedCreamCheckBox = findViewById(R.id.whipped_cream_chekcbox);
+        hasWhippedCream = whippedCreamCheckBox.isChecked();
+    }
+
+    /**
+     *
      * Creates an order summary string and returns it
      * @param price
      * @return
      */
     private String createOrderSummary(int price){
-        String s = "Name : Hassan Zekkouri\nQuantity : " + quantity + "\nTotal: $" + price + "\nThank you!";
+        String s = "Name : Hassan Zekkouri\n";
+        s += "Quantity : " + quantity + "\nTotal: $" + price + "\nThank you!";
         return s;
     }
 
