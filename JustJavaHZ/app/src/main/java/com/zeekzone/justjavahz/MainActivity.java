@@ -4,6 +4,7 @@ package com.zeekzone.justjavahz;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     int quantity = 0;
     int unitPrice = 5;
     boolean hasWhippedCream = false;
+    boolean hasChocolate = false;
 
     /**
      * This Method is called when the button Order is clicked
@@ -37,9 +39,19 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      * @return
      */
-    private void addWhippedCream(View view){
+    public void addWhippedCream(View view){
         CheckBox whippedCreamCheckBox = findViewById(R.id.whipped_cream_chekcbox);
         hasWhippedCream = whippedCreamCheckBox.isChecked();
+    }
+
+    /**
+     *
+     * @param view
+     * @return
+     */
+    public void addChocolate(View view){
+        CheckBox chocolateCheckBox = findViewById(R.id.chocolate_checkbox);
+        hasChocolate = chocolateCheckBox.isChecked();
     }
 
     /**
@@ -49,11 +61,18 @@ public class MainActivity extends AppCompatActivity {
      * @return
      */
     private String createOrderSummary(int price){
-        String s = "Name : Hassan Zekkouri\n";
-        s += "Quantity : " + quantity + "\nTotal: $" + price + "\nThank you!";
-        return s;
+        String name = getClientNAme();
+        String message = "Name : "+ name;
+        message += "\nAdd whipped cream? " + hasWhippedCream;
+        message += "\nAdd chocolate? " + hasChocolate;
+        message += "\nQuantity : " + quantity + "\nTotal: $" + price + "\nThank you!";
+        return message;
     }
 
+    private String getClientNAme(){
+        EditText nameEditText = findViewById(R.id.name_view);
+        return nameEditText.getText().toString();
+    }
     /**
      * This Method is called when the button + is clicked
      * @param view
