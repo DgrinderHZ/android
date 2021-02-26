@@ -20,8 +20,6 @@ public class MainActivity extends AppCompatActivity {
 
     int quantity = 0;
     int unitPrice = 5;
-    boolean hasWhippedCream = false;
-    boolean hasChocolate = false;
 
     /**
      * This Method is called when the button Order is clicked
@@ -30,29 +28,19 @@ public class MainActivity extends AppCompatActivity {
 
     public void submitOrder(View view){
         int price = calculatePrice(quantity, unitPrice);
-        String priceMessage = createOrderSummary(price);
+
+        // Check if the whipped cream is included.
+        CheckBox whippedCreamCheckBox = findViewById(R.id.whipped_cream_chekcbox);
+        boolean hasWhippedCream = whippedCreamCheckBox.isChecked();
+
+        // Check if the chocolate is included.
+        CheckBox chocolateCheckBox = findViewById(R.id.chocolate_checkbox);
+        boolean hasChocolate = chocolateCheckBox.isChecked();
+
+        String priceMessage = createOrderSummary(price, hasWhippedCream, hasChocolate);
         displayMessage(priceMessage);
     }
 
-    /**
-     *
-     * @param view
-     * @return
-     */
-    public void addWhippedCream(View view){
-        CheckBox whippedCreamCheckBox = findViewById(R.id.whipped_cream_chekcbox);
-        hasWhippedCream = whippedCreamCheckBox.isChecked();
-    }
-
-    /**
-     *
-     * @param view
-     * @return
-     */
-    public void addChocolate(View view){
-        CheckBox chocolateCheckBox = findViewById(R.id.chocolate_checkbox);
-        hasChocolate = chocolateCheckBox.isChecked();
-    }
 
     /**
      *
@@ -60,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
      * @param price
      * @return
      */
-    private String createOrderSummary(int price){
+    private String createOrderSummary(int price, boolean hasWhippedCream, boolean hasChocolate){
         String name = getClientNAme();
         String message = "Name : "+ name;
         message += "\nAdd whipped cream? " + hasWhippedCream;
@@ -96,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
      * @param number
      */
     private void displayQuantity(int number){
-        TextView textView = (TextView) findViewById(R.id.quantity_text_view);
+        TextView textView = findViewById(R.id.quantity_text_view);
         textView.setText("" + number);
     }
 
@@ -106,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
      * @param message
      */
     private void displayMessage(String message){
-        TextView textView = (TextView) findViewById(R.id.order_summary_text_view);
+        TextView textView = findViewById(R.id.order_summary_text_view);
         textView.setText(message);
     }
 
@@ -117,8 +105,16 @@ public class MainActivity extends AppCompatActivity {
      * @return
      */
     private int calculatePrice(int quantity, int unitPrice){
-        int price;
-        price = quantity * unitPrice;
+        int price = unitPrice;
+        // Check if the whipped cream is included.
+        CheckBox whippedCreamCheckBox = findViewById(R.id.whipped_cream_chekcbox);
+        boolean hasWhippedCream = whippedCreamCheckBox.isChecked();
+        if (hasWhippedCream) price++;
+        // Check if the chocolate is included.
+        CheckBox chocolateCheckBox = findViewById(R.id.chocolate_checkbox);
+        boolean hasChocolate = chocolateCheckBox.isChecked();
+        if(hasChocolate) price++;
+        price = quantity * price ;
         return price;
     }
 
