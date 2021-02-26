@@ -1,11 +1,13 @@
 package com.zeekzone.justjavahz;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    int quantity = 0;
+    int quantity = 1;
     int unitPrice = 5;
 
     /**
@@ -27,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
      */
 
     public void submitOrder(View view){
-        int price = calculatePrice(quantity, unitPrice);
 
         // Check if the whipped cream is included.
         CheckBox whippedCreamCheckBox = findViewById(R.id.whipped_cream_chekcbox);
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         // Check if the chocolate is included.
         CheckBox chocolateCheckBox = findViewById(R.id.chocolate_checkbox);
         boolean hasChocolate = chocolateCheckBox.isChecked();
-
+        int price = calculatePrice(quantity, unitPrice, hasWhippedCream, hasChocolate);
         String priceMessage = createOrderSummary(price, hasWhippedCream, hasChocolate);
         displayMessage(priceMessage);
     }
@@ -66,7 +67,11 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void increment(View view){
-        quantity = quantity +1;
+        if (quantity >= 100){
+            popUpAtoast("You can not have more than 100 cups!");
+            return;
+        }
+        quantity = quantity + 1;
         displayQuantity(quantity);
     }
 
@@ -75,10 +80,22 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void decrement(View view){
+        if (quantity <= 1){
+            popUpAtoast("You can not have less than 1 cup!");
+            return;
+        }
         quantity = quantity - 1;
         displayQuantity(quantity);
     }
 
+    private void popUpAtoast(String toastMessage){
+        Context context = getApplicationContext();
+        CharSequence text = toastMessage;
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+    }
     /**
      * This method changes the quantity text to display number
      * @param number
@@ -104,15 +121,11 @@ public class MainActivity extends AppCompatActivity {
      * @param unitPrice is thge price of one cup  of coffee
      * @return
      */
-    private int calculatePrice(int quantity, int unitPrice){
+    private int calculatePrice(int quantity, int unitPrice, boolean hasWhippedCream, boolean hasChocolate){
         int price = unitPrice;
         // Check if the whipped cream is included.
-        CheckBox whippedCreamCheckBox = findViewById(R.id.whipped_cream_chekcbox);
-        boolean hasWhippedCream = whippedCreamCheckBox.isChecked();
         if (hasWhippedCream) price++;
         // Check if the chocolate is included.
-        CheckBox chocolateCheckBox = findViewById(R.id.chocolate_checkbox);
-        boolean hasChocolate = chocolateCheckBox.isChecked();
         if(hasChocolate) price++;
         price = quantity * price ;
         return price;
