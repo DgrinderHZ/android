@@ -56,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
         String message = "Name : "+ name;
         message += "\nAdd whipped cream? " + hasWhippedCream;
         message += "\nAdd chocolate? " + hasChocolate;
-        message += "\nQuantity : " + quantity + "\nTotal: $" + price + "\nThank you!";
+        message += "\nQuantity : " + quantity + "\nTotal: $" + price;
+        message += "\n" + getResources().getString(R.string.thank_you);
         return message;
     }
 
