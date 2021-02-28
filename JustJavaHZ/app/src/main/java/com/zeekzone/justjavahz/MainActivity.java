@@ -2,6 +2,8 @@ package com.zeekzone.justjavahz;
 
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         boolean hasChocolate = chocolateCheckBox.isChecked();
         int price = calculatePrice(quantity, unitPrice, hasWhippedCream, hasChocolate);
         String priceMessage = createOrderSummary(price, hasWhippedCream, hasChocolate);
-        displayMessage(priceMessage);
+        composeEmail("Android testing", priceMessage);
     }
 
 
@@ -106,14 +108,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * This method changes the price to display the message
-     * @param message
-     */
-    private void displayMessage(String message){
-        TextView textView = findViewById(R.id.order_summary_text_view);
-        textView.setText(message);
-    }
+
 
     /**
      * Calculates yhr price base on the quantity specified!
@@ -131,4 +126,13 @@ public class MainActivity extends AppCompatActivity {
         return price;
     }
 
+    public void composeEmail( String subject, String body) {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, body);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
 }
