@@ -1,6 +1,7 @@
 package com.example.android.miwok;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,8 @@ import java.util.List;
 
 public class WordAdapter extends ArrayAdapter<Word> {
     private int mBgColor;
+    private MediaPlayer mMediaPlayer;
+
     public WordAdapter(@NonNull Context context, @NonNull List<Word> objects, int  bgColor) {
         super(context, 0, objects);
         this.mBgColor = bgColor;
@@ -37,8 +40,20 @@ public class WordAdapter extends ArrayAdapter<Word> {
         int color = ContextCompat.getColor(getContext(), mBgColor);
         textContainerLinearLayout.setBackgroundColor(color);
 
+
         // Get the {@link Word} object located at this position in the list
         Word currentWord = getItem(position);
+
+        // Handling audio files
+        textContainerLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMediaPlayer = MediaPlayer.create(getContext(), currentWord.getmAudioResourceId());
+                mMediaPlayer.start();
+            }
+        });
+
+
 
         // Find the TextView in the list_item.xml layout with the ID default_text_view
         TextView defaultTextView = listItemView.findViewById(R.id.default_text_view);
@@ -60,9 +75,6 @@ public class WordAdapter extends ArrayAdapter<Word> {
             // set this text on the name TextView
             placeholderImageView.setImageResource(currentWord.getImageResourceId());
         }
-
-        // Handling audio files
-
 
 
         // Return the whole list item layout (containing 2 TextViews and an ImageView)
