@@ -15,7 +15,10 @@
  */
 package com.example.android.miwok;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,13 +26,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 
 public class NumbersActivity extends AppCompatActivity {
+    private MediaPlayer mMediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.word_list);
 
-        ArrayList<Word> words = new ArrayList<Word>();
+        final ArrayList<Word> words = new ArrayList<Word>();
         words.add(new Word("one", "lutti", R.drawable.number_one, R.raw.number_one));
         words.add(new Word("two", "otiiko", R.drawable.number_two, R.raw.number_two));
         words.add(new Word("three", "tolookosu", R.drawable.number_three, R.raw.number_three));
@@ -47,5 +51,12 @@ public class NumbersActivity extends AppCompatActivity {
 
         listView.setAdapter(itemsAdapter);
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mMediaPlayer = MediaPlayer.create(NumbersActivity.this, words.get(position).getmAudioResourceId());
+                mMediaPlayer.start();
+            }
+        });
     }
 }

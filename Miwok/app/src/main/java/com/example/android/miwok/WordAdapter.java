@@ -18,7 +18,7 @@ import java.util.List;
 
 public class WordAdapter extends ArrayAdapter<Word> {
     private int mBgColor;
-    private MediaPlayer mMediaPlayer;
+    // private MediaPlayer mMediaPlayer;
 
     public WordAdapter(@NonNull Context context, @NonNull List<Word> objects, int  bgColor) {
         super(context, 0, objects);
@@ -45,13 +45,14 @@ public class WordAdapter extends ArrayAdapter<Word> {
         Word currentWord = getItem(position);
 
         // Handling audio files
+        /*
         textContainerLinearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mMediaPlayer = MediaPlayer.create(getContext(), currentWord.getmAudioResourceId());
                 mMediaPlayer.start();
             }
-        });
+        });*/
 
 
 
