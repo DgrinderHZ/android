@@ -6,6 +6,7 @@ public class Word {
     private String mDefaultTranslation;
     private String mMiwokTranslation;
     private int mImageResourceId = NO_IMAGE_PROVIDED;
+    
 
     public Word(String DefaultTranslation, String MiwokTranslation) {
         this.mDefaultTranslation = DefaultTranslation;

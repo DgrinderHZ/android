@@ -61,6 +61,9 @@ public class WordAdapter extends ArrayAdapter<Word> {
             placeholderImageView.setImageResource(currentWord.getImageResourceId());
         }
 
+        // Handling audio files
+
+
 
         // Return the whole list item layout (containing 2 TextViews and an ImageView)
         // so that it can be shown in the ListView

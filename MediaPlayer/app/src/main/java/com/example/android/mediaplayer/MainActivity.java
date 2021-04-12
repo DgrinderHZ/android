@@ -5,10 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    MediaPlayer mediaPlayer;
+    private MediaPlayer mediaPlayer;
+    private int startTime;
+    private int finalTime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -16,6 +21,24 @@ public class MainActivity extends AppCompatActivity {
 
 
         mediaPlayer = MediaPlayer.create(this, R.raw.got);
+        startTime = mediaPlayer.getCurrentPosition();
+        finalTime = mediaPlayer.getDuration();
+
+        Button forwardButton =  findViewById(R.id.forwardButton);
+        forwardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int temp = (int)startTime;
+                int forwardTime = 5000;
+                if((temp+forwardTime)<=finalTime){
+                    startTime = startTime + forwardTime;
+                    mediaPlayer.seekTo((int) startTime);
+                    Toast.makeText(getApplicationContext(),"You have Jumped forward 5 seconds",Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getApplicationContext(),"Cannot jump forward 5 seconds",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     public void play(View view){
@@ -25,4 +48,7 @@ public class MainActivity extends AppCompatActivity {
     public void pause(View view){
         mediaPlayer.pause();
     }
+
+
+
 }
