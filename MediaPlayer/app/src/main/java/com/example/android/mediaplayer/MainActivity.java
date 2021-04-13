@@ -1,12 +1,12 @@
 package com.example.android.mediaplayer;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,31 +24,38 @@ public class MainActivity extends AppCompatActivity {
         startTime = mediaPlayer.getCurrentPosition();
         finalTime = mediaPlayer.getDuration();
 
-        Button forwardButton =  findViewById(R.id.forwardButton);
+        Button forwardButton = findViewById(R.id.forwardButton);
         forwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int temp = (int)startTime;
+                int temp = (int) startTime;
                 int forwardTime = 5000;
-                if((temp+forwardTime)<=finalTime){
+                if ((temp + forwardTime) <= finalTime) {
                     startTime = startTime + forwardTime;
                     mediaPlayer.seekTo((int) startTime);
-                    Toast.makeText(getApplicationContext(),"You have Jumped forward 5 seconds",Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(getApplicationContext(),"Cannot jump forward 5 seconds",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "You have Jumped forward 5 seconds", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Cannot jump forward 5 seconds", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+
+    }
+
+    public void play(View view) {
+        mediaPlayer.start();
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                Toast.makeText(getApplicationContext(), "I'm done", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    public void play(View view){
-            mediaPlayer.start();
-    }
-
-    public void pause(View view){
+    public void pause(View view) {
         mediaPlayer.pause();
     }
-
 
 
 }
