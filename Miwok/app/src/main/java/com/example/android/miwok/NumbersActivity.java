@@ -15,6 +15,10 @@
  */
 package com.example.android.miwok;
 
+import android.content.Context;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
@@ -24,6 +28,7 @@ import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
 
 public class NumbersActivity extends AppCompatActivity {
     private MediaPlayer mMediaPlayer;
@@ -34,10 +39,48 @@ public class NumbersActivity extends AppCompatActivity {
         }
     };
 
+    private AudioManager mAudioManager;
+    /**
+     * This listener gets triggered whenever the audio focus changes
+     * (i.e., we gain or lose audio focus because of another app or device).
+     */
+    private AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ||
+                    focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+                // The AUDIOFOCUS_LOSS_TRANSIENT case means that we've lost audio focus for a
+                // short amount of time. The AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK case means that
+                // our app is allowed to continue playing sound but at a lower volume. We'll treat
+                // both cases the same way because our app is playing short sound files.
+
+                // Pause playback and reset player to the start of the file. That way, we can
+                // play the word from the beginning when we resume playback.
+                mMediaPlayer.pause();
+                mMediaPlayer.seekTo(0);
+            } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                // The AUDIOFOCUS_GAIN case means we have regained focus and can resume playback.
+                mMediaPlayer.start();
+            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                // The AUDIOFOCUS_LOSS case means we've lost audio focus and
+                // Stop playback and clean up resources
+                releaseMediaPlayer();
+            }
+        }
+    };
+
+    private final Object focusLock = new Object();
+
+    private boolean playbackDelayed = false;
+    private boolean playbackNowAuthorized = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.word_list);
+        // Create and setup {@link  AudioManager} to request audio focus
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
 
         final ArrayList<Word> words = new ArrayList<Word>();
         words.add(new Word("one", "lutti", R.drawable.number_one, R.raw.number_one));
@@ -61,9 +104,22 @@ public class NumbersActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 releaseMediaPlayer();
-                mMediaPlayer = MediaPlayer.create(NumbersActivity.this, words.get(position).getmAudioResourceId());
-                mMediaPlayer.start();
-                mMediaPlayer.setOnCompletionListener(mOnCompletionListener);
+                // requesting audio focus and processing the response
+                int res = mAudioManager.requestAudioFocus();
+                synchronized(focusLock) {
+                    if (res == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
+                        playbackNowAuthorized = false;
+                    } else if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                        playbackNowAuthorized = true;
+                        mMediaPlayer = MediaPlayer.create(NumbersActivity.this, words.get(position).getmAudioResourceId());
+                        mMediaPlayer.start();
+                        mMediaPlayer.setOnCompletionListener(mOnCompletionListener);
+                    } else if (res == AudioManager.AUDIOFOCUS_REQUEST_DELAYED) {
+                        playbackDelayed = true;
+                        playbackNowAuthorized = false;
+                    }
+                }
+                
             }
         });
     }
@@ -90,4 +146,39 @@ public class NumbersActivity extends AppCompatActivity {
             mMediaPlayer = null;
         }
     }
+
+    // implementing OnAudioFocusChangeListener to react to focus changes
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        switch (focusChange) {
+            case AudioManager.AUDIOFOCUS_GAIN:
+                if (playbackDelayed || resumeOnFocusGain) {
+                    synchronized(focusLock) {
+                        playbackDelayed = false;
+                        resumeOnFocusGain = false;
+                    }
+                    playbackNow();
+                }
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS:
+                synchronized(focusLock) {
+                    resumeOnFocusGain = false;
+                    playbackDelayed = false;
+                }
+                pausePlayback();
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                synchronized(focusLock) {
+                    // only resume if playback is being interrupted
+                    resumeOnFocusGain = isPlaying();
+                    playbackDelayed = false;
+                }
+                pausePlayback();
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                // ... pausing or ducking depends on your app
+                break;
+        }
+    }
+}
 }
