@@ -28,7 +28,6 @@ import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
-import java.util.concurrent.locks.Lock;
 
 public class NumbersActivity extends AppCompatActivity {
     private MediaPlayer mMediaPlayer;
@@ -69,10 +68,6 @@ public class NumbersActivity extends AppCompatActivity {
         }
     };
 
-    private final Object focusLock = new Object();
-
-    private boolean playbackDelayed = false;
-    private boolean playbackNowAuthorized = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,19 +100,15 @@ public class NumbersActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 releaseMediaPlayer();
                 // requesting audio focus and processing the response
-                int res = mAudioManager.requestAudioFocus();
-                synchronized(focusLock) {
-                    if (res == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
-                        playbackNowAuthorized = false;
-                    } else if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                        playbackNowAuthorized = true;
+                int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener,
+                        AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+
+                if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+
                         mMediaPlayer = MediaPlayer.create(NumbersActivity.this, words.get(position).getmAudioResourceId());
                         mMediaPlayer.start();
                         mMediaPlayer.setOnCompletionListener(mOnCompletionListener);
-                    } else if (res == AudioManager.AUDIOFOCUS_REQUEST_DELAYED) {
-                        playbackDelayed = true;
-                        playbackNowAuthorized = false;
-                    }
+
                 }
                 
             }
@@ -144,41 +135,11 @@ public class NumbersActivity extends AppCompatActivity {
             // setting the media player to null is an easy way to tell that the media player
             // is not configured to play an audio file at the moment.
             mMediaPlayer = null;
+
+            // Abandon Audio focus when playback complete
+            mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
         }
     }
 
-    // implementing OnAudioFocusChangeListener to react to focus changes
-    @Override
-    public void onAudioFocusChange(int focusChange) {
-        switch (focusChange) {
-            case AudioManager.AUDIOFOCUS_GAIN:
-                if (playbackDelayed || resumeOnFocusGain) {
-                    synchronized(focusLock) {
-                        playbackDelayed = false;
-                        resumeOnFocusGain = false;
-                    }
-                    playbackNow();
-                }
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS:
-                synchronized(focusLock) {
-                    resumeOnFocusGain = false;
-                    playbackDelayed = false;
-                }
-                pausePlayback();
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                synchronized(focusLock) {
-                    // only resume if playback is being interrupted
-                    resumeOnFocusGain = isPlaying();
-                    playbackDelayed = false;
-                }
-                pausePlayback();
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                // ... pausing or ducking depends on your app
-                break;
-        }
-    }
 }
-}
+
